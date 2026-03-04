@@ -170,8 +170,6 @@ export default function App() {
   const [adminRegion, setAdminRegion] = useState("East");
   const [standingsPass, setStandingsPass] = useState("");
   const [standingsUnlocked, setStandingsUnlocked] = useState(false);
-  const [standingsPass, setStandingsPass] = useState("");
-  const [standingsUnlocked, setStandingsUnlocked] = useState(false);
 
   // Load persisted data
   useEffect(() => {
