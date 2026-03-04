@@ -168,6 +168,10 @@ export default function App() {
   const [loaded, setLoaded] = useState(false);
   const [activeRegion, setActiveRegion] = useState("East");
   const [adminRegion, setAdminRegion] = useState("East");
+  const [standingsPass, setStandingsPass] = useState("");
+  const [standingsUnlocked, setStandingsUnlocked] = useState(false);
+  const [standingsPass, setStandingsPass] = useState("");
+  const [standingsUnlocked, setStandingsUnlocked] = useState(false);
 
   // Load persisted data
   useEffect(() => {
@@ -288,6 +292,7 @@ export default function App() {
           <div>
             <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, fontSize:28, letterSpacing:2, color:"#f97316", lineHeight:1 }}>🏀 MARCH MADNESS</div>
             <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:13, color:"#94a3b8", letterSpacing:3, textTransform:"uppercase" }}>Office Bracket Challenge</div>
+            <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontSize:11, color:"#475569", letterSpacing:2, textTransform:"uppercase", marginTop:3 }}>Tompkins & Peters CPAs, P.C.</div>
           </div>
           <div style={{ display:"flex", gap:8 }}>
             {[["home","🏠 Home"],["submit","📝 Submit"],["leaderboard","🏆 Standings"],["admin","⚙️ Admin"]].map(([v,label]) => (
@@ -412,21 +417,39 @@ export default function App() {
         {view === "leaderboard" && (
           <div>
             <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, fontSize:28, color:"#f97316", marginBottom:20 }}>🏆 STANDINGS</div>
-            {sortedEntries.length === 0
-              ? <div style={{ color:"#334155", fontStyle:"italic" }}>No entries yet. Be the first to submit!</div>
-              : sortedEntries.map((e, i) => <LBRow key={e.name} rank={i+1} entry={e} maxScore={maxScore} />)
-            }
-            <div style={{ marginTop:24, background:"#0d1626", border:"1px solid #1e2a4a", borderRadius:12, padding:20 }}>
-              <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:700, fontSize:14, color:"#64748b", marginBottom:12 }}>SCORING SYSTEM</div>
-              <div style={{ display:"flex", gap:16, flexWrap:"wrap" }}>
-                {[["R64","1pt"],["R32","2pts"],["Sweet 16","4pts"],["Elite 8","8pts"],["Final Four","16pts"],["Championship","32pts"]].map(([r,p]) => (
-                  <div key={r} style={{ textAlign:"center", background:"#070b14", borderRadius:8, padding:"10px 16px" }}>
-                    <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, fontSize:20, color:"#f97316" }}>{p}</div>
-                    <div style={{ fontSize:10, color:"#475569", fontFamily:"'Barlow Condensed',sans-serif", letterSpacing:1, textTransform:"uppercase" }}>{r}</div>
-                  </div>
-                ))}
+            {!standingsUnlocked ? (
+              <div style={{ background:"#0d1626", border:"1px solid #1e2a4a", borderRadius:12, padding:32, maxWidth:400 }}>
+                <div style={{ fontSize:32, marginBottom:12 }}>🔒</div>
+                <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:700, fontSize:18, marginBottom:6 }}>Standings are locked</div>
+                <div style={{ fontSize:13, color:"#64748b", marginBottom:20 }}>Enter the staff password to view the leaderboard.</div>
+                <input type="password" value={standingsPass} onChange={e => setStandingsPass(e.target.value)}
+                  onKeyDown={e => e.key==="Enter" && (standingsPass==="tompkins2025" ? setStandingsUnlocked(true) : showToast("Wrong password",false))}
+                  placeholder="Staff password..."
+                  style={{ padding:"10px 14px", borderRadius:8, border:"1px solid #1e2a4a", background:"#070b14", color:"#f1f5f9", fontFamily:"'Barlow Condensed',sans-serif", fontSize:15, outline:"none", width:"100%", boxSizing:"border-box" }} />
+                <button onClick={() => standingsPass==="tompkins2025" ? setStandingsUnlocked(true) : showToast("Wrong password",false)}
+                  style={{ marginTop:12, width:"100%", padding:"10px", borderRadius:8, border:"none", background:"#f97316", color:"#fff", fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, fontSize:15, cursor:"pointer" }}>VIEW STANDINGS</button>
               </div>
-            </div>
+            ) : (
+              <div>
+                {sortedEntries.length === 0
+                  ? <div style={{ color:"#334155", fontStyle:"italic" }}>No entries yet. Be the first to submit!</div>
+                  : sortedEntries.map((e, i) => <LBRow key={e.name} rank={i+1} entry={e} maxScore={maxScore} />)
+                }
+                <div style={{ marginTop:24, background:"#0d1626", border:"1px solid #1e2a4a", borderRadius:12, padding:20 }}>
+                  <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:700, fontSize:14, color:"#64748b", marginBottom:12 }}>SCORING SYSTEM</div>
+                  <div style={{ display:"flex", gap:16, flexWrap:"wrap" }}>
+                    {[["R64","1pt"],["R32","2pts"],["Sweet 16","4pts"],["Elite 8","8pts"],["Final Four","16pts"],["Championship","32pts"]].map(([r,p]) => (
+                      <div key={r} style={{ textAlign:"center", background:"#070b14", borderRadius:8, padding:"10px 16px" }}>
+                        <div style={{ fontFamily:"'Barlow Condensed',sans-serif", fontWeight:900, fontSize:20, color:"#f97316" }}>{p}</div>
+                        <div style={{ fontSize:10, color:"#475569", fontFamily:"'Barlow Condensed',sans-serif", letterSpacing:1, textTransform:"uppercase" }}>{r}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <button onClick={() => { setStandingsUnlocked(false); setStandingsPass(""); }}
+                  style={{ marginTop:16, padding:"8px 20px", borderRadius:8, border:"1px solid #1e2a4a", background:"transparent", color:"#475569", fontFamily:"'Barlow Condensed',sans-serif", fontWeight:700, fontSize:13, cursor:"pointer" }}>🔒 Lock Standings</button>
+              </div>
+            )}
           </div>
         )}
 
